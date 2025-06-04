@@ -10,7 +10,7 @@ A powerful and flexible image cropping component for Expo/React Native applicati
 - 🎨 **Customizable UI**: Beautiful, modern interface with customizable controls
 - 📱 **Expo Ready**: Optimized for Expo managed workflow
 - 🔧 **TypeScript**: Full TypeScript support with proper type definitions
-- ⚡ **Recoil State**: Efficient state management with Recoil
+- 🔄 **Self-Contained**: No external state management required - works out of the box
 
 ## 🚀 Installation
 
@@ -42,23 +42,7 @@ This means **zero extra installation steps** for most users! 🎉
 
 ## 🏁 Quick Start
 
-1. **Wrap your app with RecoilRoot:**
-
-```tsx
-import React from "react";
-import { RecoilRoot } from "recoil";
-import { YourAppContent } from "./YourAppContent";
-
-export default function App() {
-  return (
-    <RecoilRoot>
-      <YourAppContent />
-    </RecoilRoot>
-  );
-}
-```
-
-2. **Use the ImageEditor component:**
+**Use the ImageEditor component directly - no setup required:**
 
 ```tsx
 import React, { useState } from "react";
@@ -69,8 +53,8 @@ export default function MyScreen() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleCropComplete = (croppedUri: string) => {
-    setImageUri(croppedUri);
+  const handleCropComplete = (croppedImageData: any) => {
+    setImageUri(croppedImageData.uri);
     setIsEditing(false);
   };
 
@@ -82,15 +66,14 @@ export default function MyScreen() {
 
       <Button title="Edit Image" onPress={() => setIsEditing(true)} />
 
-      {isEditing && (
-        <ImageEditor
-          imageUri="your-image-uri-here"
-          onEditingComplete={handleCropComplete}
-          onCloseEditor={() => setIsEditing(false)}
-          fixedAspectRatio={1} // Optional: 1 for square, undefined for free-form
-          dynamicCrop={true} // Enable dynamic cropping
-        />
-      )}
+      <ImageEditor
+        isVisible={isEditing}
+        imageUri="your-image-uri-here"
+        onEditingComplete={handleCropComplete}
+        onEditingCancel={() => setIsEditing(false)}
+        fixedAspectRatio={1} // Optional: 1 for square, undefined for free-form
+        dynamicCrop={true} // Enable dynamic cropping
+      />
     </View>
   );
 }
@@ -102,9 +85,10 @@ export default function MyScreen() {
 
 ```tsx
 <ImageEditor
+  isVisible={isEditing}
   imageUri={imageUri}
   onEditingComplete={handleCrop}
-  onCloseEditor={handleClose}
+  onEditingCancel={handleClose}
   dynamicCrop={true} // Free-form cropping
 />
 ```
@@ -113,27 +97,28 @@ export default function MyScreen() {
 
 ```tsx
 // Square (1:1)
-<ImageEditor fixedAspectRatio={1} dynamicCrop={false} />
+<ImageEditor isVisible={isEditing} fixedAspectRatio={1} dynamicCrop={false} />
 
 // Landscape (16:9)
-<ImageEditor fixedAspectRatio={16/9} dynamicCrop={false} />
+<ImageEditor isVisible={isEditing} fixedAspectRatio={16/9} dynamicCrop={false} />
 
 // Portrait (4:3)
-<ImageEditor fixedAspectRatio={3/4} dynamicCrop={false} />
+<ImageEditor isVisible={isEditing} fixedAspectRatio={3/4} dynamicCrop={false} />
 ```
 
 ## 📚 API Reference
 
 ### ImageEditor Props
 
-| Prop                | Type                    | Default      | Description                        |
-| ------------------- | ----------------------- | ------------ | ---------------------------------- |
-| `imageUri`          | `string`                | **Required** | URI of the image to crop           |
-| `onEditingComplete` | `(uri: string) => void` | **Required** | Callback when cropping is complete |
-| `onCloseEditor`     | `() => void`            | **Required** | Callback when editor is closed     |
-| `fixedAspectRatio`  | `number \| undefined`   | `undefined`  | Fixed aspect ratio (width/height)  |
-| `dynamicCrop`       | `boolean`               | `true`       | Enable free-form cropping          |
-| `quality`           | `number`                | `1.0`        | Output image quality (0-1)         |
+| Prop                | Type                        | Default      | Description                        |
+| ------------------- | --------------------------- | ------------ | ---------------------------------- |
+| `isVisible`         | `boolean`                   | **Required** | Controls modal visibility          |
+| `imageUri`          | `string`                    | **Required** | URI of the image to crop           |
+| `onEditingComplete` | `(data: ImageData) => void` | **Required** | Callback when cropping is complete |
+| `onEditingCancel`   | `() => void`                | **Required** | Callback when editing is cancelled |
+| `fixedAspectRatio`  | `number \| undefined`       | `undefined`  | Fixed aspect ratio (width/height)  |
+| `dynamicCrop`       | `boolean`                   | `true`       | Enable free-form cropping          |
+| `quality`           | `number`                    | `1.0`        | Output image quality (0-1)         |
 
 ## 🎨 Customization
 
@@ -154,4 +139,3 @@ If you encounter any issues or need support, please create an issue on GitHub.
 ---
 
 **Made with ❤️ for the Expo community**
-# expo-dynamic-image-crop

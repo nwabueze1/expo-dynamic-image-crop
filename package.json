@@ -1,0 +1,49 @@
+{
+  "name": "expo-dynamic-image-crop",
+  "version": "1.1.0",
+  "description": "Dynamic image cropping component for Expo/React Native with free-form and fixed aspect ratio support",
+  "main": "lib/index.js",
+  "module": "lib/index.esm.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "expo",
+    "react-native",
+    "image-crop",
+    "dynamic-crop",
+    "image-editor",
+    "crop-component",
+    "gesture-handler"
+  ],
+  "author": "Fidelis Okeke",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nwabueze1/expo-dynamic-image-crop.git"
+  },
+  "peerDependencies": {
+    "expo": ">=49.0.0",
+    "react": ">=18.0.0",
+    "react-native": ">=0.70.0"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
+    "expo-image-manipulator": "^13.0.0",
+    "react-native-gesture-handler": "^2.20.0",
+    "recoil": "^0.7.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.70.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "LICENSE"
+  ]
+}

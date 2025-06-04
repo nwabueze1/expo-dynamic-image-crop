@@ -1,0 +1,29 @@
+# Source files (we include compiled lib/ instead)
+src/
+tsconfig.json
+
+# Development files
+example/
+node_modules/
+*.log
+.DS_Store
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files (if any)
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Build artifacts (keep lib/)
+# lib/ is included because it's our compiled output
