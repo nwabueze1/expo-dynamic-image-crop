@@ -1,6 +1,6 @@
 {
   "name": "expo-dynamic-image-crop",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Dynamic image cropping component for Expo/React Native with free-form and fixed aspect ratio support",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
@@ -17,7 +17,14 @@
     "dynamic-crop",
     "image-editor",
     "crop-component",
-    "gesture-handler"
+    "gesture-handler",
+    "cross-platform",
+    "android",
+    "ios",
+    "image-manipulation",
+    "photo-editor",
+    "expo-image-crop",
+    "react-native-image-crop"
   ],
   "author": "Fidelis Okeke",
   "license": "MIT",

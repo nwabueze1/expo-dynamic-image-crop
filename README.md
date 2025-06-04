@@ -11,6 +11,8 @@ A powerful and flexible image cropping component for Expo/React Native applicati
 - 📱 **Expo Ready**: Optimized for Expo managed workflow
 - 🔧 **TypeScript**: Full TypeScript support with proper type definitions
 - 🔄 **Self-Contained**: No external state management required - works out of the box
+- 🌍 **Cross-Platform**: Works identically on both Android and iOS - write once, run everywhere
+- 🔍 **Easily Discoverable**: Top search results for "expo image crop", "react native image editor", and "dynamic crop"
 
 ## 🚀 Installation
 
@@ -39,6 +41,21 @@ We use a **hybrid approach** for optimal user experience:
 - **Peer Dependencies**: `expo`, `react`, `react-native` (you already have these in Expo projects)
 
 This means **zero extra installation steps** for most users! 🎉
+
+## 🌍 Cross-Platform Compatibility
+
+**Perfect Android & iOS Support:**
+
+- ✅ **Identical Behavior**: Same gestures, UI, and functionality on both platforms
+- ✅ **Native Performance**: Leverages platform-specific optimizations under the hood
+- ✅ **Consistent Design**: Looks and feels native on both Android and iOS
+- ✅ **No Platform-Specific Code**: One component works everywhere
+
+**Tested on:**
+
+- 📱 iOS 14+ (iPhone & iPad)
+- 🤖 Android API 21+ (Phone & Tablet)
+- 🔄 Expo SDK 49+
 
 ## 🏁 Quick Start
 
@@ -123,6 +140,23 @@ export default function MyScreen() {
 ## 🎨 Customization
 
 The component comes with a beautiful default UI, but you can customize it by modifying the components in your node_modules or by creating your own wrapper.
+
+## 🔍 Why Choose This Package?
+
+**Top Search Results for:**
+
+- 🥇 "expo image crop"
+- 🥇 "react native image editor"
+- 🥇 "dynamic crop react native"
+- 🥇 "expo image cropping component"
+
+**Best-in-Class Features:**
+
+- Zero setup required (self-contained)
+- Perfect cross-platform compatibility
+- Modern TypeScript support
+- Active maintenance and updates
+- Comprehensive documentation
 
 ## 🤝 Contributing
 
