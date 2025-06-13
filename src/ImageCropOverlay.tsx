@@ -258,13 +258,29 @@ const ImageCropOverlay = () => {
         finalHeight = minHeight;
       }
 
-      // Update position if needed (for top/left handles)
-      const xOffset = isLeft ? cropSize.width - finalWidth : 0;
-      const yOffset = isTop ? cropSize.height - finalHeight : 0;
+      // Improved logic for left/top handles
+      let newX = accumulatedPan.x;
+      let newY = accumulatedPan.y;
+
+      if (isLeft) {
+        newX = accumulatedPan.x + (cropSize.width - finalWidth);
+        if (newX < imageBounds.x) {
+          finalWidth = cropSize.width + (accumulatedPan.x - imageBounds.x);
+          newX = imageBounds.x;
+        }
+      }
+
+      if (isTop) {
+        newY = accumulatedPan.y + (cropSize.height - finalHeight);
+        if (newY < imageBounds.y) {
+          finalHeight = cropSize.height + (accumulatedPan.y - imageBounds.y);
+          newY = imageBounds.y;
+        }
+      }
 
       setAccumulatedPan({
-        x: accumulatedPan.x + xOffset,
-        y: accumulatedPan.y + yOffset,
+        x: newX,
+        y: newY,
       });
 
       setCropSize({
@@ -301,9 +317,19 @@ const ImageCropOverlay = () => {
         finalHeight = finalWidth / fixedAspectRatio;
       }
 
+      let newX = accumulatedPan.x;
+      let newY = accumulatedPan.y;
+
+      if (isLeft) {
+        newX = accumulatedPan.x + (cropSize.width - finalWidth);
+      }
+      if (isTop) {
+        newY = accumulatedPan.y + (cropSize.height - finalHeight);
+      }
+
       setAccumulatedPan({
-        x: accumulatedPan.x + (isLeft ? -x : 0),
-        y: accumulatedPan.y + (isTop ? -y : 0),
+        x: newX,
+        y: newY,
       });
 
       setCropSize({
@@ -341,6 +367,8 @@ const ImageCropOverlay = () => {
                 <View style={styles.sectionRow} key={horizontalSection}>
                   {verticalSections.map((verticalSection) => {
                     const key = horizontalSection + verticalSection;
+                    const isBottomRight = key === "bottomright";
+
                     return (
                       <View
                         style={[
@@ -349,25 +377,16 @@ const ImageCropOverlay = () => {
                         ]}
                         key={key}
                       >
-                        {key === "topleft" ||
-                        key === "topright" ||
-                        key === "bottomleft" ||
-                        key === "bottomright"
-                          ? coverMarker?.show && (
-                              <View
-                                style={[
-                                  styles.cornerMarker,
-                                  { borderColor: coverMarker?.color },
-                                  horizontalSection === "top"
-                                    ? { top: -4, borderTopWidth: 7 }
-                                    : { bottom: -4, borderBottomWidth: 7 },
-                                  verticalSection === "left"
-                                    ? { left: -4, borderLeftWidth: 7 }
-                                    : { right: -4, borderRightWidth: 7 },
-                                ]}
-                              />
-                            )
-                          : null}
+                        {isBottomRight && coverMarker?.show && (
+                          <View
+                            style={[
+                              styles.cornerMarker,
+                              { borderColor: coverMarker?.color },
+                              { bottom: -4, borderBottomWidth: 7 },
+                              { right: -4, borderRightWidth: 7 },
+                            ]}
+                          />
+                        )}
                       </View>
                     );
                   })}
