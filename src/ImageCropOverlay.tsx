@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import {
   GestureEvent,
@@ -9,31 +9,36 @@ import {
   PanGestureHandlerEventPayload,
   State,
 } from "react-native-gesture-handler";
-import { useRecoilState, useRecoilValue } from "recoil";
 import { EditorContext } from "./context/editor";
-import { accumulatedPanState, cropSizeState, editorOptionsState, imageBoundsState } from "./Store";
+import { useEditorStore } from "./store";
 
 const horizontalSections = ["top", "middle", "bottom"];
 const verticalSections = ["left", "middle", "right"];
 
-type GestureHandlerEventPayloadType = GestureEvent<PanGestureHandlerEventPayload>;
-type HandlerStateChangeEventType = HandlerStateChangeEvent<PanGestureHandlerEventPayload>;
+type GestureHandlerEventPayloadType =
+  GestureEvent<PanGestureHandlerEventPayload>;
+type HandlerStateChangeEventType =
+  HandlerStateChangeEvent<PanGestureHandlerEventPayload>;
 
 const ImageCropOverlay = () => {
   const [selectedFrameSection, setSelectedFrameSection] = useState("");
-  const [cropSize, setCropSize] = useRecoilState(cropSizeState);
-  const [imageBounds] = useRecoilState(imageBoundsState);
-  const [accumulatedPan, setAccumulatedPan] = useRecoilState(accumulatedPanState);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const cropSize = useEditorStore((s) => s.cropSize);
+  const setCropSize = useEditorStore((s) => s.setCropSize);
+  const imageBounds = useEditorStore((s) => s.imageBounds);
+  const accumulatedPan = useEditorStore((s) => s.accumulatedPan);
+  const setAccumulatedPan = useEditorStore((s) => s.setAccumulatedPan);
+  const { gridOverlayColor, coverMarker, overlayCropColor } = useEditorStore(
+    (s) => s.editorOptions
+  );
 
-  const { gridOverlayColor, coverMarker, overlayCropColor } = useRecoilValue(editorOptionsState);
-
-  const { fixedAspectRatio, minimumCropDimensions, dynamicCrop } = useContext(EditorContext);
+  const { fixedAspectRatio, minimumCropDimensions, dynamicCrop } =
+    useContext(EditorContext);
   const [animatedCropSize] = useState({
     width: new Animated.Value(cropSize.width),
     height: new Animated.Value(cropSize.height),
   });
-  const panX = useRef(new Animated.Value(imageBounds.x));
-  const panY = useRef(new Animated.Value(imageBounds.y));
 
   useEffect(() => {
     checkCropBounds({
@@ -92,25 +97,12 @@ const ImageCropOverlay = () => {
   const onOverlayMove = ({ nativeEvent }: GestureHandlerEventPayloadType) => {
     if (selectedFrameSection !== "") {
       if (isMovingSection()) {
-        Animated.event(
-          [
-            {
-              translationX: panX.current,
-              translationY: panY.current,
-            },
-          ],
-          { useNativeDriver: false },
-        )(nativeEvent);
+        setDragOffset({
+          x: nativeEvent.translationX,
+          y: nativeEvent.translationY,
+        });
       } else {
         const { x, y } = getTargetCropFrameBounds(nativeEvent);
-
-        if (isTop) {
-          panY.current.setValue(-y);
-        }
-
-        if (isLeft) {
-          panX.current.setValue(-x);
-        }
 
         animatedCropSize.width.setValue(cropSize.width + x);
         animatedCropSize.height.setValue(cropSize.height + y);
@@ -145,7 +137,10 @@ const ImageCropOverlay = () => {
     translationY: number;
   };
 
-  const getTargetCropFrameBounds = ({ translationX, translationY }: Translate) => {
+  const getTargetCropFrameBounds = ({
+    translationX,
+    translationY,
+  }: Translate) => {
     let x = 0;
     let y = 0;
 
@@ -179,13 +174,43 @@ const ImageCropOverlay = () => {
     return { x, y };
   };
 
-  const onOverlayRelease = (nativeEvent: Readonly<HandlerStateChangeEventPayload & PanGestureHandlerEventPayload>) => {
-    isMovingSection() ? checkCropBounds(nativeEvent) : checkResizeBounds(nativeEvent);
+  const onOverlayRelease = (
+    nativeEvent: Readonly<
+      HandlerStateChangeEventPayload & PanGestureHandlerEventPayload
+    >
+  ) => {
+    if (isMovingSection()) {
+      let newX = accumulatedPan.x + dragOffset.x;
+      let newY = accumulatedPan.y + dragOffset.y;
+
+      // Clamp to bounds
+      if (newX <= imageBounds.x) {
+        newX = imageBounds.x;
+      } else if (newX + cropSize.width > imageBounds.width + imageBounds.x) {
+        newX = imageBounds.x + imageBounds.width - cropSize.width;
+      }
+      if (newY <= imageBounds.y) {
+        newY = imageBounds.y;
+      } else if (newY + cropSize.height > imageBounds.height + imageBounds.y) {
+        newY = imageBounds.y + imageBounds.height - cropSize.height;
+      }
+
+      setAccumulatedPan({ x: newX, y: newY });
+      setDragOffset({ x: 0, y: 0 });
+    } else {
+      checkResizeBounds(nativeEvent);
+    }
     setSelectedFrameSection("");
   };
 
-  const onHandlerStateChange = ({ nativeEvent }: HandlerStateChangeEventType) => {
-    if (nativeEvent.state === State.END) onOverlayRelease(nativeEvent);
+  const onHandlerStateChange = ({
+    nativeEvent,
+  }: HandlerStateChangeEventType) => {
+    if (nativeEvent.state === State.BEGAN) setIsDragging(true);
+    if (nativeEvent.state === State.END) {
+      onOverlayRelease(nativeEvent);
+      setIsDragging(false);
+    }
   };
 
   const checkCropBounds = ({ translationX, translationY }: Translate) => {
@@ -205,8 +230,6 @@ const ImageCropOverlay = () => {
       accDy = imageBounds.y + imageBounds.height - cropSize.height;
     }
 
-    panX.current.setValue(0);
-    panY.current.setValue(0);
     setAccumulatedPan({ x: accDx, y: accDy });
   };
 
@@ -288,9 +311,6 @@ const ImageCropOverlay = () => {
         width: finalWidth,
       });
     }
-
-    panX.current.setValue(0);
-    panY.current.setValue(0);
   };
 
   return (
@@ -310,26 +330,29 @@ const ImageCropOverlay = () => {
               animatedCropSize,
               {
                 transform: [
-                  { translateX: Animated.add(panX.current, accumulatedPan.x) },
-                  { translateY: Animated.add(panY.current, accumulatedPan.y) },
+                  { translateX: accumulatedPan.x + dragOffset.x },
+                  { translateY: accumulatedPan.y + dragOffset.y },
                 ],
               },
             ]}
           >
             {horizontalSections.map((horizontalSection) => {
               return (
-                <View
-                  style={styles.sectionRow}
-                  key={horizontalSection}
-                >
+                <View style={styles.sectionRow} key={horizontalSection}>
                   {verticalSections.map((verticalSection) => {
                     const key = horizontalSection + verticalSection;
                     return (
                       <View
-                        style={[styles.defaultSection, { borderColor: gridOverlayColor }]}
+                        style={[
+                          styles.defaultSection,
+                          { borderColor: gridOverlayColor },
+                        ]}
                         key={key}
                       >
-                        {key === "topleft" || key === "topright" || key === "bottomleft" || key === "bottomright"
+                        {key === "topleft" ||
+                        key === "topright" ||
+                        key === "bottomleft" ||
+                        key === "bottomright"
                           ? coverMarker?.show && (
                               <View
                                 style={[

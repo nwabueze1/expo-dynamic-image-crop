@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { useRecoilState } from "recoil";
 import { ImageCropOverlay } from "./ImageCropOverlay";
-import { editingModeState, imageBoundsState, imageDataState, imageScaleFactorState } from "./Store";
+import { useEditorStore } from "./store";
 
 type Layout = {
   width: number;
@@ -11,10 +10,10 @@ type Layout = {
 
 export function EditingWindow() {
   const [imageLayout, setImageLayout] = useState<Layout | null>(null);
-  const [imageData] = useRecoilState(imageDataState);
-  const [, setImageBounds] = useRecoilState(imageBoundsState);
-  const [, setImageScaleFactor] = useRecoilState(imageScaleFactorState);
-  const [editingMode] = useRecoilState(editingModeState);
+  const imageData = useEditorStore((s) => s.imageData);
+  const setImageBounds = useEditorStore((s) => s.setImageBounds);
+  const setImageScaleFactor = useEditorStore((s) => s.setImageScaleFactor);
+  const editingMode = useEditorStore((s) => s.editingMode);
   const isCropping = editingMode === "crop";
 
   const getImageFrame = (layout: Layout) => {
@@ -28,13 +27,19 @@ export function EditingWindow() {
       const bounds = { x: 0, y: 0, width: 0, height: 0 };
       let imageScaleFactor = 1;
       if (imageAspectRatio > editingWindowAspectRatio) {
-        bounds.x = (((imageAspectRatio - editingWindowAspectRatio) / imageAspectRatio) * layout.width) / 2;
+        bounds.x =
+          (((imageAspectRatio - editingWindowAspectRatio) / imageAspectRatio) *
+            layout.width) /
+          2;
         bounds.width = layout.height / imageAspectRatio;
         bounds.height = layout.height;
         imageScaleFactor = imageData.height / layout.height;
       } else {
         bounds.y =
-          (((1 / imageAspectRatio - 1 / editingWindowAspectRatio) / (1 / imageAspectRatio)) * layout.height) / 2;
+          (((1 / imageAspectRatio - 1 / editingWindowAspectRatio) /
+            (1 / imageAspectRatio)) *
+            layout.height) /
+          2;
         bounds.width = layout.width;
         bounds.height = layout.width * imageAspectRatio;
         imageScaleFactor = imageData.width / layout.width;
@@ -50,6 +55,7 @@ export function EditingWindow() {
 
   useEffect(() => {
     onUpdateCropLayout(imageLayout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageData]);
 
   return (

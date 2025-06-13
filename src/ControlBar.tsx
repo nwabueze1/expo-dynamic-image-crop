@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { StyleSheet, View } from "react-native";
-import { useRecoilState, useRecoilValue } from "recoil";
 import { IconButton } from "./components/IconButton";
 import { EditorContext } from "./context/editor";
 import { usePerformCrop } from "./hooks/usePerformCrop";
-import { editorOptionsState, isEditState } from "./Store";
+import { useEditorStore } from "./store";
 
 function ControlBar() {
-  const [isEdit, setIsEdit] = useRecoilState(isEditState);
-  const { controlBar } = useRecoilValue(editorOptionsState);
+  const isEdit = useEditorStore((s) => s.isEdit);
+  const setIsEdit = useEditorStore((s) => s.setIsEdit);
+  const { controlBar } = useEditorStore((s) => s.editorOptions);
   const { onBackPress, onSave } = useContext(EditorContext);
   const performCrop = usePerformCrop();
 

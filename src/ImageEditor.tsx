@@ -2,20 +2,12 @@ import React from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { ReactNode, useCallback, useEffect } from "react";
 import { Modal, StatusBar, StyleSheet, View } from "react-native";
-import { RecoilRoot, useRecoilState, useRecoilValue } from "recoil";
 import { ImageEditorProps } from "./types";
 import { EditorContext } from "./context/editor";
 import { ControlBar } from "./ControlBar";
 import { EditingWindow } from "./EditingWindow";
 import { Processing } from "./Processing";
-import {
-  editingModeState,
-  editorOptionsState,
-  imageDataState,
-  isEditState,
-  processingState,
-  readyState,
-} from "./Store";
+import { useEditorStore } from "./store";
 
 function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
   const {
@@ -28,35 +20,36 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
     processingComponent,
     editorOptions,
   } = props;
-  const [options, setOptions] = useRecoilState(editorOptionsState);
-  const [imageData, setImageData] = useRecoilState(imageDataState);
-  const [, setReady] = useRecoilState(readyState);
-  const [, setEditingMode] = useRecoilState(editingModeState);
-  const [, setProcessing] = useRecoilState(processingState);
-  const [isEdit] = useRecoilState(isEditState);
+
+  const options = useEditorStore((s) => s.editorOptions);
+  const setOptions = useEditorStore((s) => s.setEditorOptions);
+  const imageData = useEditorStore((s) => s.imageData);
+  const setImageData = useEditorStore((s) => s.setImageData);
+  const setReady = useEditorStore((s) => s.setReady);
+  const setEditingMode = useEditorStore((s) => s.setEditingMode);
+  const setProcessing = useEditorStore((s) => s.setProcessing);
+  const isEdit = useEditorStore((s) => s.isEdit);
 
   const initialize = useCallback(async () => {
     setProcessing(true);
     if (imageUri) {
-      const { width: pickerWidth, height: pickerHeight } = await ImageManipulator.manipulateAsync(imageUri, []);
-
+      const { width: pickerWidth, height: pickerHeight } =
+        await ImageManipulator.manipulateAsync(imageUri, []);
       setImageData({
         uri: imageUri,
         width: pickerWidth,
         height: pickerHeight,
       });
-
       setReady(true);
       setProcessing(false);
     }
-  }, []);
+  }, [imageUri, setImageData, setProcessing, setReady]);
 
   const onBackPress = () => {
     if (!isEdit) {
       onEditingCancel();
     } else {
       setProcessing(true);
-
       initialize().then(() => {
         setEditingMode("crop");
         setProcessing(false);
@@ -70,6 +63,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
 
   useEffect(() => {
     initialize().then(setCustomStyles).catch(console.error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageUri]);
 
   function setCustomStyles() {
@@ -85,11 +79,8 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
             // @ts-ignore
             custom[key] = value;
           }
-
-          // console.log(JSON.stringify(custom, null, 2))
         }
       });
-
       setOptions(custom);
     }
   }
@@ -116,9 +107,11 @@ type Props = {
 };
 
 export function ImageEditorView({ processingComponent }: Props) {
-  const [ready] = useRecoilState(readyState);
-  const [processing] = useRecoilState(processingState);
-  const { backgroundColor, controlBar } = useRecoilValue(editorOptionsState);
+  const ready = useEditorStore((s) => s.ready);
+  const processing = useEditorStore((s) => s.processing);
+  const { backgroundColor, controlBar } = useEditorStore(
+    (s) => s.editorOptions
+  );
 
   return (
     <>
@@ -137,13 +130,8 @@ export function ImageEditorView({ processingComponent }: Props) {
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
   return (
-    <Modal
-      visible={isVisible}
-      style={styles.modalContainer}
-    >
-      <RecoilRoot>
-        <ImageEditorCore {...props} />
-      </RecoilRoot>
+    <Modal visible={isVisible} style={styles.modalContainer}>
+      <ImageEditorCore {...props} />
     </Modal>
   );
 }
