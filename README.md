@@ -99,6 +99,17 @@ export default function MyScreen() {
 }
 ```
 
+## 🧑‍💻 Example App
+
+Want to see this package in action?
+Check out the full example Expo app here:
+👉 [expo-dynamic-image-crop-example (GitHub)](https://github.com/nwabueze1/expo-dynamic-image-crop-example)
+
+- The **Index screen** demonstrates dynamic cropping (free-form).
+- The **Explore screen** demonstrates fixed aspect ratio cropping.
+
+Clone, run, and experiment with all features before integrating into your own project!
+
 ## 🎛️ Cropping Modes
 
 ### Free-Form Cropping (Dynamic)
