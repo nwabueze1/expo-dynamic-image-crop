@@ -13,6 +13,9 @@ A powerful and flexible image cropping component for Expo/React Native applicati
 - 🔄 **Self-Contained**: No external state management required - works out of the box
 - 🌍 **Cross-Platform**: Works identically on both Android and iOS - write once, run everywhere
 - 🔍 **Easily Discoverable**: Top search results for "expo image crop", "react native image editor", and "dynamic crop"
+- ⚡ **React 19+ Compatible**: Uses Zustand for state management, no provider or setup required
+
+> **Note:** This package now uses [Zustand](https://github.com/pmndrs/zustand) for state management. No need to wrap your app in any provider. Fully compatible with React 19+ and Expo managed workflow.
 
 ## 🚀 Installation
 
@@ -37,7 +40,7 @@ npx expo install expo-image-manipulator react-native-gesture-handler
 
 We use a **hybrid approach** for optimal user experience:
 
-- **Included**: `@expo/vector-icons`, `expo-image-manipulator`, `react-native-gesture-handler`, `recoil`
+- **Included**: `@expo/vector-icons`, `expo-image-manipulator`, `react-native-gesture-handler`, `zustand`
 - **Peer Dependencies**: `expo`, `react`, `react-native` (you already have these in Expo projects)
 
 This means **zero extra installation steps** for most users! 🎉
@@ -157,6 +160,7 @@ The component comes with a beautiful default UI, but you can customize it by mod
 - Modern TypeScript support
 - Active maintenance and updates
 - Comprehensive documentation
+- **React 19+ compatible** (thanks to Zustand!)
 
 ## 🤝 Contributing
 
