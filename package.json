@@ -6,8 +6,11 @@
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf lib && tsc",
     "prepublishOnly": "npm run build",
+    "publish:patch": "rm -rf lib && npm version patch && npm publish",
+    "publish:minor": "rm -rf lib && npm version minor && npm publish",
+    "publish:major": "rm -rf lib && npm version major && npm publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
