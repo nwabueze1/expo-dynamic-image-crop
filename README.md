@@ -2,6 +2,12 @@
 
 A powerful and flexible image cropping component for Expo/React Native applications with dynamic cropping capabilities, fixed aspect ratios, and smooth gesture handling.
 
+## 📱 **Live Demo**
+
+![Corner Dragging Demo](https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png)
+
+_All four corner markers work perfectly - drag from any corner for smooth, real-time cropping!_
+
 ## ✨ Features
 
 - 🖼️ **Dynamic Cropping**: Free-form cropping with independent width/height adjustment
@@ -136,6 +142,21 @@ Clone, run, and experiment with all features before integrating into your own pr
 // Portrait (4:3)
 <ImageEditor isVisible={isEditing} fixedAspectRatio={3/4} dynamicCrop={false} />
 ```
+
+## 🎯 **Visual Showcase**
+
+<div align="center">
+
+![Professional Corner Dragging](https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png)
+
+**✨ Professional-Grade Corner Dragging**
+
+- All 4 corners work smoothly
+- Real-time visual feedback
+- No jumping or glitches
+- Perfect for production apps
+
+</div>
 
 ## 📚 API Reference
 
