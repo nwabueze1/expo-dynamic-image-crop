@@ -4,7 +4,9 @@ A powerful and flexible image cropping component for Expo/React Native applicati
 
 ## 📱 **Live Demo**
 
-![Corner Dragging Demo](https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png)
+<div align="center">
+  <img src="https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png" alt="Corner Dragging Demo" width="300" />
+</div>
 
 _All four corner markers work perfectly - drag from any corner for smooth, real-time cropping!_
 
@@ -147,13 +149,12 @@ Clone, run, and experiment with all features before integrating into your own pr
 
 <div align="center">
 
-![Professional Corner Dragging](https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png)
+<img src="https://raw.githubusercontent.com/nwabueze1/expo-dynamic-image-crop/main/docs/images/crop-demo.png" alt="Professional Corner Dragging" width="400" />
 
 **✨ Professional-Grade Corner Dragging**
 
 - All 4 corners work smoothly
 - Real-time visual feedback
-- No jumping or glitches
 - Perfect for production apps
 
 </div>
