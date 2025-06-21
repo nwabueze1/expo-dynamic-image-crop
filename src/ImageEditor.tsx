@@ -29,6 +29,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
   const setEditingMode = useEditorStore((s) => s.setEditingMode);
   const setProcessing = useEditorStore((s) => s.setProcessing);
   const isEdit = useEditorStore((s) => s.isEdit);
+  const resetEditorStore = useEditorStore((s) => s.resetEditorStore);
 
   const initialize = useCallback(async () => {
     setProcessing(true);
@@ -59,6 +60,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
 
   const onSave = () => {
     onEditingComplete(imageData);
+    resetEditorStore();
   };
 
   useEffect(() => {

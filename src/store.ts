@@ -45,7 +45,43 @@ export interface EditorStore {
   setIsEdit: (isEdit: boolean) => void;
   editorOptions: EditorOptions;
   setEditorOptions: (options: EditorOptions) => void;
+  resetEditorStore: () => void;
 }
+
+const defaultEditorOptions: EditorOptions = {
+  backgroundColor: "#222",
+  overlayCropColor: "#33333355",
+  gridOverlayColor: "#ffffff88",
+  coverMarker: {
+    show: true,
+    color: "#fff",
+  },
+  controlBar: {
+    position: "top",
+    height: 80,
+    backgroundColor: "#333",
+    backButton: {
+      color: "#fff",
+      iconName: "arrow-back",
+      text: "Back",
+    },
+    cropButton: {
+      color: "#fff",
+      iconName: "crop",
+      text: "Crop",
+    },
+    saveButton: {
+      color: "#fff",
+      iconName: "done",
+      text: "Save",
+    },
+    cancelButton: {
+      color: "#fff",
+      iconName: "cancel",
+      text: "Cancel",
+    },
+  },
+};
 
 export const useEditorStore = create<EditorStore>((set) => ({
   imageData: { uri: "", width: 0, height: 0 },
@@ -66,39 +102,19 @@ export const useEditorStore = create<EditorStore>((set) => ({
   setEditingMode: (mode) => set({ editingMode: mode }),
   isEdit: false,
   setIsEdit: (isEdit) => set({ isEdit }),
-  editorOptions: {
-    backgroundColor: "#222",
-    overlayCropColor: "#33333355",
-    gridOverlayColor: "#ffffff88",
-    coverMarker: {
-      show: true,
-      color: "#fff",
-    },
-    controlBar: {
-      position: "top",
-      height: 80,
-      backgroundColor: "#333",
-      backButton: {
-        color: "#fff",
-        iconName: "arrow-back",
-        text: "Back",
-      },
-      cropButton: {
-        color: "#fff",
-        iconName: "crop",
-        text: "Crop",
-      },
-      saveButton: {
-        color: "#fff",
-        iconName: "done",
-        text: "Save",
-      },
-      cancelButton: {
-        color: "#fff",
-        iconName: "cancel",
-        text: "Cancel",
-      },
-    },
-  },
+  editorOptions: defaultEditorOptions,
   setEditorOptions: (options) => set({ editorOptions: options }),
+  resetEditorStore: () =>
+    set({
+      imageData: { uri: "", width: 0, height: 0 },
+      imageScaleFactor: 1,
+      imageBounds: { x: 0, y: 0, width: 0, height: 0 },
+      ready: false,
+      processing: false,
+      accumulatedPan: { x: 0, y: 0 },
+      cropSize: { width: 0, height: 0 },
+      editingMode: "crop",
+      isEdit: false,
+      editorOptions: defaultEditorOptions,
+    }),
 }));
