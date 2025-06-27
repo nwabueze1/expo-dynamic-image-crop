@@ -60,7 +60,6 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
 
   const onSave = () => {
     onEditingComplete(imageData);
-    resetEditorStore();
   };
 
   useEffect(() => {
@@ -131,6 +130,15 @@ export function ImageEditorView({ processingComponent }: Props) {
 }
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
+  const resetEditorStore = useEditorStore((s) => s.resetEditorStore);
+
+  // Reset store when modal becomes invisible
+  useEffect(() => {
+    if (!isVisible) {
+      resetEditorStore();
+    }
+  }, [isVisible]);
+
   return (
     <Modal visible={isVisible} style={styles.modalContainer}>
       <ImageEditorCore {...props} />
