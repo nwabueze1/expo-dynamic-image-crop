@@ -137,14 +137,11 @@ export function ImageEditorView({ processingComponent }: Props) {
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
-      setLoading(true);
       setTimeout(() => {
         setOpen(true);
-        setLoading(false);
       }, 1000);
     } else {
       setOpen(false);
@@ -153,7 +150,6 @@ export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
 
   return (
     <View style={styles.root}>
-      <ActivityIndicator animating={loading} size="large" />
       <Modal visible={open} style={styles.modalContainer}>
         <ImageEditorCore {...props} />
       </Modal>
