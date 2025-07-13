@@ -55,7 +55,6 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
   const onBackPress = () => {
     if (!isEdit) {
       onEditingCancel();
-      resetEditorStore();
     } else {
       setProcessing(true);
       initialize().then(() => {
@@ -67,7 +66,6 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
 
   const onSave = () => {
     onEditingComplete(imageData);
-    resetEditorStore();
   };
 
   useEffect(() => {
@@ -139,16 +137,16 @@ export function ImageEditorView({ processingComponent }: Props) {
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
   const [open, setOpen] = useState(false);
+  const resetEditorStore = useEditorStore((s) => s.resetEditorStore);
 
   useEffect(() => {
     if (isVisible) {
       setTimeout(() => {
         setOpen(true);
-      }, 350);
+      }, 400);
     } else {
-      setTimeout(() => {
-        setOpen(false);
-      }, 350);
+      setOpen(false);
+      resetEditorStore();
     }
   }, [isVisible]);
 
