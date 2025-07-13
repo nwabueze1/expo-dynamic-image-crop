@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { ReactNode, useCallback, useEffect } from "react";
 import {
@@ -136,21 +136,20 @@ export function ImageEditorView({ processingComponent }: Props) {
 }
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
+  const openModalRef = useRef(false);
 
   useEffect(() => {
     if (isVisible) {
-      setTimeout(() => {
-        setOpen(true);
-      }, 1000);
+      openModalRef.current = true;
     } else {
-      setOpen(false);
+      openModalRef.current = false;
     }
   }, [isVisible]);
 
   return (
     <View style={styles.root}>
-      <Modal visible={open} style={styles.modalContainer}>
+      <Modal visible={openModalRef.current} style={styles.modalContainer}>
         <ImageEditorCore {...props} />
       </Modal>
     </View>
