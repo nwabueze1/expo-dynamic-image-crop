@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { ReactNode, useCallback, useEffect } from "react";
 import { Modal, StatusBar, StyleSheet, View } from "react-native";
@@ -130,8 +130,26 @@ export function ImageEditorView({ processingComponent }: Props) {
 }
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      setTimeout(() => {
+        setOpen(true);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setOpen(false);
+      }, 100);
+    }
+  }, [isVisible]);
+
+  if (open) {
+    console.log("open");
+  }
+
   return (
-    <Modal visible={isVisible} style={styles.modalContainer}>
+    <Modal visible={open} style={styles.modalContainer}>
       <ImageEditorCore {...props} />
     </Modal>
   );
