@@ -146,7 +146,9 @@ export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
         setOpen(true);
       }, 350);
     } else {
-      setOpen(false);
+      setTimeout(() => {
+        setOpen(false);
+      }, 350);
     }
   }, [isVisible]);
 
