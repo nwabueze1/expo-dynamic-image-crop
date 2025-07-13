@@ -62,10 +62,12 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
         setProcessing(false);
       });
     }
+    resetEditorStore();
   };
 
   const onSave = () => {
     onEditingComplete(imageData);
+    resetEditorStore();
   };
 
   useEffect(() => {
