@@ -136,20 +136,21 @@ export function ImageEditorView({ processingComponent }: Props) {
 }
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
-  // const [open, setOpen] = useState(false);
-  const openModalRef = useRef(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
-      openModalRef.current = true;
+      setTimeout(() => {
+        setOpen(true);
+      }, 300);
     } else {
-      openModalRef.current = false;
+      setOpen(false);
     }
   }, [isVisible]);
 
   return (
     <View style={styles.root}>
-      <Modal visible={openModalRef.current} style={styles.modalContainer}>
+      <Modal visible={open} style={styles.modalContainer}>
         <ImageEditorCore {...props} />
       </Modal>
     </View>
