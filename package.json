@@ -1,6 +1,6 @@
 {
   "name": "expo-dynamic-image-crop",
-  "version": "1.4.26",
+  "version": "1.4.27",
   "description": "Dynamic image cropping component for Expo/React Native with free-form and fixed aspect ratio support",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
