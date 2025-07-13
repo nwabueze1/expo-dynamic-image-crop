@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { ReactNode, useCallback, useEffect } from "react";
-import { Modal, StatusBar, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  StatusBar,
+  StyleSheet,
+  View,
+} from "react-native";
 import { ImageEditorProps } from "./types";
 import { EditorContext } from "./context/editor";
 import { ControlBar } from "./ControlBar";
@@ -131,27 +137,27 @@ export function ImageEditorView({ processingComponent }: Props) {
 
 export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
+      setLoading(true);
       setTimeout(() => {
         setOpen(true);
-      }, 100);
+        setLoading(false);
+      }, 1000);
     } else {
-      setTimeout(() => {
-        setOpen(false);
-      }, 100);
+      setOpen(false);
     }
   }, [isVisible]);
 
-  if (open) {
-    console.log("open");
-  }
-
   return (
-    <Modal visible={open} style={styles.modalContainer}>
-      <ImageEditorCore {...props} />
-    </Modal>
+    <View style={styles.root}>
+      <ActivityIndicator animating={loading} size="large" />
+      <Modal visible={open} style={styles.modalContainer}>
+        <ImageEditorCore {...props} />
+      </Modal>
+    </View>
   );
 }
 
@@ -162,5 +168,10 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     zIndex: 1,
+  },
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
