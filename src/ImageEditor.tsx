@@ -153,11 +153,9 @@ export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
   }, [isVisible]);
 
   return (
-    <View style={styles.root}>
-      <Modal visible={open} style={styles.modalContainer}>
-        <ImageEditorCore {...props} />
-      </Modal>
-    </View>
+    <Modal visible={open} style={styles.modalContainer}>
+      <ImageEditorCore {...props} />
+    </Modal>
   );
 }
 
@@ -168,10 +166,5 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     zIndex: 1,
-  },
-  root: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });
