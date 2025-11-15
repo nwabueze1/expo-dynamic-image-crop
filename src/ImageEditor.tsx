@@ -55,6 +55,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
   const onBackPress = () => {
     if (!isEdit) {
       onEditingCancel();
+      resetEditorStore();
     } else {
       setProcessing(true);
       initialize().then(() => {
@@ -66,6 +67,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
 
   const onSave = () => {
     onEditingComplete(imageData);
+    resetEditorStore();
   };
 
   useEffect(() => {
