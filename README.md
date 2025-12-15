@@ -145,6 +145,134 @@ Clone, run, and experiment with all features before integrating into your own pr
 <ImageEditor isVisible={isEditing} fixedAspectRatio={3/4} dynamicCrop={false} />
 ```
 
+## 🎨 Advanced Features
+
+### Custom Control Bar
+
+Replace the default control bar with your own custom UI to match your app's design:
+
+```tsx
+import { ImageEditor, ControlBarActions } from "expo-dynamic-image-crop";
+
+function MyCustomControlBar({ actions }: { actions: ControlBarActions }) {
+  return (
+    <View style={styles.customControls}>
+      <Button
+        title={actions.isEdit ? "Back" : "Cancel"}
+        onPress={actions.isEdit ? actions.onBack : actions.onCancel}
+      />
+      <Text>{actions.isEdit ? "Edit Mode" : "Crop Mode"}</Text>
+      <Button
+        title={actions.isEdit ? "Save" : "Crop"}
+        onPress={actions.isEdit ? actions.onSave : actions.onCrop}
+      />
+    </View>
+  );
+}
+
+// Use your custom control bar
+<ImageEditor
+  imageUri={imageUri}
+  isVisible={isEditing}
+  onEditingComplete={handleCrop}
+  onEditingCancel={handleClose}
+  customControlBar={(actions) => <MyCustomControlBar actions={actions} />}
+/>
+```
+
+**Available Actions:**
+
+- `onCancel()` - Cancels editing and closes the editor
+- `onCrop()` - Performs the crop operation (async)
+- `onSave()` - Saves the cropped image
+- `onBack()` - Returns from edit mode to crop mode
+- `isEdit` - Boolean indicating current mode (false = cropping, true = editing)
+
+### Modal vs Inline Usage
+
+**Default Modal Mode:**
+
+```tsx
+// Wraps editor in a modal (default behavior)
+<ImageEditor
+  isVisible={isEditing}
+  imageUri={imageUri}
+  onEditingComplete={handleCrop}
+  onEditingCancel={handleClose}
+/>
+```
+
+**Inline Mode (No Modal):**
+
+```tsx
+// Renders directly inline - great for custom screens
+<ImageEditor
+  useModal={false}
+  imageUri={imageUri}
+  onEditingComplete={handleCrop}
+  onEditingCancel={handleClose}
+/>
+```
+
+**Using ImageEditorView Directly:**
+
+```tsx
+import { ImageEditorView } from "expo-dynamic-image-crop";
+
+// Full control - no modal wrapper at all
+<View style={{ height: 600 }}>
+  <ImageEditorView
+    imageUri={imageUri}
+    onEditingComplete={handleCrop}
+    onEditingCancel={handleClose}
+  />
+</View>
+```
+
+### Advanced State Hooks
+
+For building custom UI or reacting to editor state changes, use the provided hooks:
+
+```tsx
+import {
+  useEditorProcessing,
+  useEditorReady,
+  useEditorImageData,
+  useEditorMode,
+  useEditorCropInfo,
+} from "expo-dynamic-image-crop";
+
+function CustomLoadingIndicator() {
+  const processing = useEditorProcessing(); // true when processing
+  return processing ? <Spinner /> : null;
+}
+
+function ImageDimensions() {
+  const imageData = useEditorImageData(); // { uri, width, height }
+  return <Text>Size: {imageData.width} x {imageData.height}</Text>;
+}
+
+function ModeIndicator() {
+  const { isEdit, editingMode } = useEditorMode();
+  return <Text>Mode: {isEdit ? "Editing" : "Cropping"}</Text>;
+}
+
+function CropDimensions() {
+  const { cropSize } = useEditorCropInfo();
+  return <Text>Crop: {Math.round(cropSize.width)} x {Math.round(cropSize.height)}</Text>;
+}
+```
+
+**Available Hooks:**
+
+- `useEditorProcessing()` - Returns processing state (boolean)
+- `useEditorReady()` - Returns ready state (boolean)
+- `useEditorImageData()` - Returns current image data (ImageData)
+- `useEditorMode()` - Returns { isEdit, editingMode }
+- `useEditorCropInfo()` - Returns { cropSize, imageBounds, accumulatedPan }
+
+> **Note:** These are advanced APIs. For most use cases, the standard component props are sufficient.
+
 ## 🎯 **Visual Showcase**
 
 <div align="center">
@@ -163,15 +291,42 @@ Clone, run, and experiment with all features before integrating into your own pr
 
 ### ImageEditor Props
 
-| Prop                | Type                        | Default      | Description                        |
-| ------------------- | --------------------------- | ------------ | ---------------------------------- |
-| `isVisible`         | `boolean`                   | **Required** | Controls modal visibility          |
-| `imageUri`          | `string`                    | **Required** | URI of the image to crop           |
-| `onEditingComplete` | `(data: ImageData) => void` | **Required** | Callback when cropping is complete |
-| `onEditingCancel`   | `() => void`                | **Required** | Callback when editing is cancelled |
-| `fixedAspectRatio`  | `number \| undefined`       | `undefined`  | Fixed aspect ratio (width/height)  |
-| `dynamicCrop`       | `boolean`                   | `true`       | Enable free-form cropping          |
-| `quality`           | `number`                    | `1.0`        | Output image quality (0-1)         |
+| Prop                 | Type                                         | Default      | Description                                           |
+| -------------------- | -------------------------------------------- | ------------ | ----------------------------------------------------- |
+| `imageUri`           | `string \| null`                             | **Required** | URI of the image to crop                              |
+| `onEditingComplete`  | `(data: ImageData) => void`                  | **Required** | Callback when cropping is complete                    |
+| `onEditingCancel`    | `() => void`                                 | **Required** | Callback when editing is cancelled                    |
+| `isVisible`          | `boolean`                                    | `undefined`  | Controls modal visibility (required when using modal) |
+| `useModal`           | `boolean`                                    | `true`       | Wrap editor in modal (true) or render inline (false)  |
+| `customControlBar`   | `(actions: ControlBarActions) => ReactNode`  | `undefined`  | Custom control bar component                          |
+| `fixedAspectRatio`   | `number \| undefined`                        | `undefined`  | Fixed aspect ratio (width/height)                     |
+| `dynamicCrop`        | `boolean`                                    | `true`       | Enable free-form cropping                             |
+| `processingComponent`| `ReactNode`                                  | `undefined`  | Custom loading component                              |
+| `editorOptions`      | `EditorOptions`                              | Default UI   | Customize colors, control bar position, etc.          |
+
+### ControlBarActions Type
+
+Actions passed to custom control bar components:
+
+```typescript
+type ControlBarActions = {
+  onCancel: () => void;      // Cancel editing
+  onCrop: () => Promise<void>; // Perform crop
+  onSave: () => void;        // Save cropped image
+  onBack: () => void;        // Go back to crop mode
+  isEdit: boolean;           // Current mode
+};
+```
+
+### ImageData Type
+
+```typescript
+type ImageData = {
+  uri: string;    // Image URI
+  width: number;  // Image width in pixels
+  height: number; // Image height in pixels
+};
+```
 
 ## 🎨 Customization
 

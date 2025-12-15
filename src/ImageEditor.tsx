@@ -1,21 +1,21 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { ReactNode, useCallback, useEffect } from "react";
 import {
-  ActivityIndicator,
   Modal,
   StatusBar,
   StyleSheet,
   View,
 } from "react-native";
-import { ImageEditorProps } from "./types";
+import { ImageEditorProps, ControlBarActions } from "./types";
 import { EditorContext } from "./context/editor";
 import { ControlBar } from "./ControlBar";
 import { EditingWindow } from "./EditingWindow";
 import { Processing } from "./Processing";
 import { useEditorStore } from "./store";
+import { usePerformCrop } from "./hooks/usePerformCrop";
 
-function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
+function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible" | "useModal">) {
   const {
     minimumCropDimensions = { width: 100, height: 100 },
     fixedAspectRatio = 0.66666666666,
@@ -25,6 +25,7 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
     imageUri = null,
     processingComponent,
     editorOptions,
+    customControlBar,
   } = props;
 
   const options = useEditorStore((s) => s.editorOptions);
@@ -106,29 +107,68 @@ function ImageEditorCore(props: Omit<ImageEditorProps, "isVisible">) {
       }}
     >
       <StatusBar hidden={true} />
-      <ImageEditorView processingComponent={processingComponent} />
+      <ImageEditorView
+        processingComponent={processingComponent}
+        customControlBar={customControlBar}
+      />
     </EditorContext.Provider>
   );
 }
 
 type Props = {
   processingComponent?: ReactNode;
+  customControlBar?: (actions: ControlBarActions) => ReactNode;
 };
 
-export function ImageEditorView({ processingComponent }: Props) {
+export function ImageEditorView({
+  processingComponent,
+  customControlBar,
+}: Props) {
   const ready = useEditorStore((s) => s.ready);
   const processing = useEditorStore((s) => s.processing);
+  const isEdit = useEditorStore((s) => s.isEdit);
+  const setIsEdit = useEditorStore((s) => s.setIsEdit);
   const { backgroundColor, controlBar } = useEditorStore(
     (s) => s.editorOptions
   );
+  const { onBackPress, onSave } = useContext(EditorContext);
+  const performCrop = usePerformCrop();
+
+  // Create actions object for custom control bar
+  const controlBarActions: ControlBarActions = {
+    onCancel: () => {
+      onBackPress();
+      setIsEdit(false);
+    },
+    onCrop: async () => {
+      await performCrop();
+      setIsEdit(true);
+    },
+    onSave: onSave,
+    onBack: () => {
+      onBackPress();
+      setIsEdit(false);
+    },
+    isEdit,
+  };
 
   return (
     <>
       {ready && (
         <View style={[styles.container, { backgroundColor }]}>
-          {controlBar?.position === "top" && <ControlBar />}
-          <EditingWindow />
-          {controlBar?.position === "bottom" && <ControlBar />}
+          {/* Render custom control bar if provided, otherwise use default */}
+          {customControlBar ? (
+            <>
+              {customControlBar(controlBarActions)}
+              <EditingWindow />
+            </>
+          ) : (
+            <>
+              {controlBar?.position === "top" && <ControlBar />}
+              <EditingWindow />
+              {controlBar?.position === "bottom" && <ControlBar />}
+            </>
+          )}
         </View>
       )}
 
@@ -137,23 +177,50 @@ export function ImageEditorView({ processingComponent }: Props) {
   );
 }
 
-export function ImageEditor({ isVisible, ...props }: ImageEditorProps) {
+/**
+ * Main ImageEditor component with optional modal wrapper
+ *
+ * @param props - ImageEditorProps
+ * @param props.useModal - Whether to wrap editor in a modal (default: true)
+ * @param props.isVisible - Modal visibility (required when useModal is true)
+ *
+ * @example
+ * // With modal (default behavior)
+ * <ImageEditor isVisible={showEditor} imageUri={uri} ... />
+ *
+ * @example
+ * // Inline without modal
+ * <ImageEditor useModal={false} imageUri={uri} ... />
+ */
+export function ImageEditor({
+  isVisible,
+  useModal = true,
+  ...props
+}: ImageEditorProps) {
   const [open, setOpen] = useState(false);
   const resetEditorStore = useEditorStore((s) => s.resetEditorStore);
 
   useEffect(() => {
-    if (isVisible) {
-      setTimeout(() => {
-        setOpen(true);
-      }, 600);
-    } else {
-      resetEditorStore();
-      setTimeout(() => {
-        setOpen(false);
-      }, 100);
+    if (useModal && isVisible !== undefined) {
+      if (isVisible) {
+        setTimeout(() => {
+          setOpen(true);
+        }, 600);
+      } else {
+        resetEditorStore();
+        setTimeout(() => {
+          setOpen(false);
+        }, 100);
+      }
     }
-  }, [isVisible]);
+  }, [isVisible, useModal, resetEditorStore]);
 
+  // Inline mode: render directly without modal
+  if (!useModal) {
+    return <ImageEditorCore {...props} />;
+  }
+
+  // Modal mode: wrap in modal (default behavior)
   return (
     <Modal visible={open} style={styles.modalContainer}>
       <ImageEditorCore {...props} />

@@ -6,6 +6,7 @@ export type {
   EditorOptions,
   MaterialIconNames,
   FeatherIconNames,
+  ControlBarActions,
 } from "./types";
 
 // Optional: Export individual components if users want to use them separately
@@ -19,5 +20,19 @@ export { usePerformCrop } from "./hooks/usePerformCrop";
 export { EditorContext } from "./context/editor";
 export type { EditorContextData } from "./context/editor";
 
-// Note: Recoil atoms are intentionally not exported to keep the package self-contained
-// Users should not need to manage the internal state directly
+// Advanced: Editor State Hooks
+// These hooks provide safe, read-only access to editor state
+// Use these for building custom UI or reacting to editor state changes
+export {
+  useEditorProcessing,
+  useEditorReady,
+  useEditorImageData,
+  useEditorMode,
+  useEditorCropInfo,
+} from "./hooks/useEditorState";
+
+// Export types for advanced usage
+export type { CropInfo, CropSize, ImageBounds, Pan } from "./types";
+
+// Note: The internal Zustand store (useEditorStore) is intentionally not exported
+// to prevent misuse and ensure API stability. Use the hooks above instead.
