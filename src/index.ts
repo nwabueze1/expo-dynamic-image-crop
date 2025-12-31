@@ -14,6 +14,7 @@ export { ControlBar } from "./ControlBar";
 export { EditingWindow } from "./EditingWindow";
 export { ImageCropOverlay } from "./ImageCropOverlay";
 export { Processing } from "./Processing";
+export { CropperModal } from "./CropperModal";
 
 // Export hooks and context for advanced usage
 export { usePerformCrop } from "./hooks/usePerformCrop";
